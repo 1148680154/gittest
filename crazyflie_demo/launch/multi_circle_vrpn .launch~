@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="joy_dev" default="/dev/input/js0" />
+  <arg name="ip" default="192.168.0.1" />
+  <arg name="port" default="3883" />
+  <arg name="battery_threshold" default="3.2"/>
+
+  <arg name="uri1" default="radio://0/80/250K/E7E7E7E701" />
+  <arg name="frame1" default="/cf1" />
+  <arg name="x1" default="-0.3" />
+  <arg name="y1" default="-1.4" />
+  <arg name="z1" default="1" />
+
+  <arg name="uri2" default="radio://0/80/250K/E7E7E7E702" />
+  <arg name="frame2" default="/cf2" />
+  <arg name="x2" default="0.2" />
+  <arg name="y2" default="-1.4" />
+  <arg name="z2" default="1" />
+
+  <include file="$(find crazyflie_driver)/launch/crazyflie_server.launch">
+  </include>
+
+  <node name="joy" pkg="joy" type="joy_node" output="screen">
+    <param name="dev" value="$(arg joy_dev)" />
+  </node>
+
+  <group ns="crazyflie1">
+    <include file="$(find crazyflie_driver)/launch/crazyflie_add.launch">
+      <arg name="uri" value="$(arg uri1)" />
+      <arg name="tf_prefix" value="crazyflie1" />
+      <arg name="enable_logging" value="False" />
+      <arg name="enable_logging_imu" default="False" />
+      <arg name="enable_logging_temperature" default="False" />
+      <arg name="enable_logging_magnetic_field" default="False" />
+      <arg name="enable_logging_pressure" default="False" />
+      <arg name="enable_logging_battery" default="True" />
+    </include>
+
+    <node name="joystick_controller" pkg="crazyflie_demo" type="controller.py" output="screen">
+      <param name="use_crazyflie_controller" value="True" />
+      <param name="joy_topic" value="/joy" />
+    </node>
+
+    <include file="$(find crazyflie_controller)/launch/crazyflie2_1.launch">
+      <arg name="frame" value="$(arg frame1)" />
+      <arg name="battery_threshold" default="$(arg battery_threshold)"/>
+    </include>
+
+    <!--node name="pose" pkg="crazyflie_demo" type="publish_pose.py" output="screen">
+      <param name="name" value="goal" />
+      <param name="rate" value="120" />
+      <param name="x" value="$(arg x1)" />
+      <param name="y" value="$(arg y1)" />
+      <param name="z" value="$(arg z1)" />
+    </node-->
+
+    <node name="pose" pkg="crazyflie_demo" type="demo_circle.py" output="screen">
+      <param name="frame" value="$(arg frame1)" />
+      <param name="radius" value="0.2" />
+      <param name="freq" value="0.2" />
+      <param name="lap" value="5" />
+    </node>
+
+    <!-- run vrpn client -->
+    <node pkg="vrpn_client_ros" type="vrpn_client_node" name="vrpn_client_node" output="screen" required="true">
+      <rosparam subst_value="true">
+        server: 192.168.0.1
+        port: 3883
+
+        update_frequency: 120.0
+        frame_id: world
+
+        # Use the VRPN server's time, or the client's ROS time.
+        use_server_time: false
+        broadcast_tf: true
+
+        # Must either specify refresh frequency > 0.0, or a list of trackers to create
+        refresh_tracker_frequency: 1.0
+        trackers: cf1
+        #- FirstTracker
+        #- SecondTracker
+      </rosparam>
+      <param name="ip" value="$(arg ip)" />
+      <param name="port" value="$(arg port)" />
+      <param name="frame_id" value="/world" />
+      <param name="child_frame_id" value="$(arg frame2)" />
+    </node>
+  </group>
+
+  <group ns="crazyflie2">
+    <include file="$(find crazyflie_driver)/launch/crazyflie_add.launch">
+      <arg name="uri" value="$(arg uri2)" />
+      <arg name="tf_prefix" value="crazyflie2" />
+      <arg name="enable_logging" value="False" />
+      <arg name="enable_logging_imu" default="False" />
+      <arg name="enable_logging_temperature" default="False" />
+      <arg name="enable_logging_magnetic_field" default="False" />
+      <arg name="enable_logging_pressure" default="False" />
+      <arg name="enable_logging_battery" default="True" />
+    </include>
+
+    <node name="joystick_controller" pkg="crazyflie_demo" type="controller.py" output="screen">
+      <param name="use_crazyflie_controller" value="True" />
+      <param name="joy_topic" value="/joy" />
+    </node>
+
+    <include file="$(find crazyflie_controller)/launch/crazyflie2_2.launch">
+      <arg name="frame" value="$(arg frame2)" />
+      <arg name="battery_threshold" default="$(arg battery_threshold)"/>
+    </include>
+
+    <!--node name="pose" pkg="crazyflie_demo" type="publish_pose.py" output="screen">
+      <param name="name" value="goal" />
+      <param name="rate" value="120" />
+      <param name="x" value="$(arg x2)" />
+      <param name="y" value="$(arg y2)" />
+      <param name="z" value="$(arg z2)" />
+    </node-->
+
+    <node name="pose" pkg="crazyflie_demo" type="demo_circle.py" output="screen">
+      <param name="frame" value="$(arg frame2)" />
+      <param name="radius" value="0.2" />
+      <param name="freq" value="0.2" />
+      <param name="lap" value="5" />
+    </node>
+
+    <!-- run vrpn client -->
+    <node pkg="vrpn_client_ros" type="vrpn_client_node" name="vrpn_client_node" output="screen" required="true">
+      <rosparam subst_value="true">
+        server: 192.168.0.1
+        port: 3883
+
+        update_frequency: 120.0
+        frame_id: world
+
+        # Use the VRPN server's time, or the client's ROS time.
+        use_server_time: false
+        broadcast_tf: true
+
+        # Must either specify refresh frequency > 0.0, or a list of trackers to create
+        refresh_tracker_frequency: 1.0
+        trackers: cf2
+        #- FirstTracker
+        #- SecondTracker
+      </rosparam>
+      <param name="ip" value="$(arg ip)" />
+      <param name="port" value="$(arg port)" />
+      <param name="frame_id" value="/world" />
+      <param name="child_frame_id" value="$(arg frame2)" />
+    </node>
+  </group>
+
+</launch>

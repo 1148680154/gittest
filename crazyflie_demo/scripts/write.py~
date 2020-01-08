@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+import rospy
+from std_msgs.msg import Int16MultiArray
+import time
+
+def callback1(msg):
+    file_handle = open('1.txt', mode ='a')
+    file_handle.write(str(msg.data[1])+'\n')
+    file_handle.close()
+
+def callback2(msg):
+    file_handle = open('2.txt', mode ='a')
+    file_handle.write(str(msg.data[1])+'\n')
+    file_handle.close()
+
+def callback3(msg):
+    file_handle = open('3.txt', mode ='a')
+    file_handle.write(str(msg.data[1])+'\n')
+    file_handle.close()
+
+def callback4(msg):
+    file_handle = open('4.txt', mode ='a')
+    file_handle.write(str(msg.data[1])+'\n')
+    file_handle.close()
+
+def callback5(msg):
+    file_handle = open('5.txt', mode ='a')
+    file_handle.write(str(msg.data[1])+'\n')
+    file_handle.close()
+
+def listener():
+
+    rospy.init_node('writer', anonymous=True)
+
+    rospy.Subscriber('/r1/center1', Int16MultiArray, callback1)
+    rospy.Subscriber('/r2/center2', Int16MultiArray, callback2)
+    rospy.Subscriber('/r3/center3', Int16MultiArray, callback3)
+    rospy.Subscriber('center4', Int16MultiArray, callback4)
+    rospy.Subscriber('center5', Int16MultiArray, callback5)
+    rospy.spin()
+
+if __name__ == '__main__':
+    listener()

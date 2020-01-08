@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+from circle import Circle
+
+if __name__ == '__main__':
+    circle = Circle(
+        [
+            #x   ,   y,   z, yaw, sleep
+            [0.0  ,  0.0, 1.0, 0, 8],
+	    [0.0  ,  0.0 ,1.0, 0, 3],
+  	    [-0.3 , -1.4, 0.0, 0, 0],
+        ]
+    )
+    circle.run()
